@@ -20,7 +20,7 @@ public class Engine {
         this.figures = figures;
     }
 
-    public Set<Field> getResult(boolean multi) {
+    public Set<Field> getResult(boolean multithreading) {
         final List<Figure> figuresList = new ArrayList<>();
         figuresList.addAll(figures);
         final Figure fig = figuresList.remove(0);
@@ -31,7 +31,7 @@ public class Engine {
                 Figure[][] field = new Figure[height][width];
                 field = fillConstraints(y, x, fig, field);
                 final Figure[][] finalField = field;
-                if (multi) {
+                if (multithreading) {
                     threads.add(new Thread(new Runnable() {
                         @Override
                         public void run() {
@@ -43,7 +43,7 @@ public class Engine {
                 }
             }
         }
-        if (multi) {
+        if (multithreading) {
             for (Thread thrd : threads) {
                 thrd.start();
             }
