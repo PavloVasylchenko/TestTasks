@@ -95,95 +95,96 @@ public class Engine {
     // В места которые нельзя ставить фигуры ставим NONE, фигуры ставить можно только в места null.
     private Figure[][] fillConstraints(int y, int x, Figure figure, Figure[][] field) {
         final int val = width > height ? width : height;
-        if (figure == Figure.QUEEN) {
-            for (int i = 0; i < height; i++) {
-                if (field[i][x] != null && field[i][x] != Figure.NONE) return null;
-                field[i][x] = Figure.NONE;
-            }
-            for (int i = 0; i < width; i++) {
-                if (field[y][i] != null && field[y][i] != Figure.NONE) return null;
-                field[y][i] = Figure.NONE;
-            }
-            for (int i = 0; i < val; i++) {
-                if (y + i < height && x + i < width) {
-                    if (field[y + i][x + i] != null && field[y + i][x + i] != Figure.NONE) return null;
-                    field[y + i][x + i] = Figure.NONE;
+        switch (figure) {
+            case QUEEN: {
+                for (int i = 0; i < height; i++) {
+                    if (field[i][x] != null && field[i][x] != Figure.NONE) return null;
+                    field[i][x] = Figure.NONE;
                 }
-                if (y - i >= 0 && x - i >= 0) {
-                    if (field[y - i][x - i] != null && field[y - i][x - i] != Figure.NONE) return null;
-                    field[y - i][x - i] = Figure.NONE;
+                for (int i = 0; i < width; i++) {
+                    if (field[y][i] != null && field[y][i] != Figure.NONE) return null;
+                    field[y][i] = Figure.NONE;
                 }
+                for (int i = 0; i < val; i++) {
+                    if (y + i < height && x + i < width) {
+                        if (field[y + i][x + i] != null && field[y + i][x + i] != Figure.NONE) return null;
+                        field[y + i][x + i] = Figure.NONE;
+                    }
+                    if (y - i >= 0 && x - i >= 0) {
+                        if (field[y - i][x - i] != null && field[y - i][x - i] != Figure.NONE) return null;
+                        field[y - i][x - i] = Figure.NONE;
+                    }
 
-                if (y + i < height && x - i >= 0) {
-                    if (field[y + i][x - i] != null && field[y + i][x - i] != Figure.NONE) return null;
-                    field[y + i][x - i] = Figure.NONE;
-                }
+                    if (y + i < height && x - i >= 0) {
+                        if (field[y + i][x - i] != null && field[y + i][x - i] != Figure.NONE) return null;
+                        field[y + i][x - i] = Figure.NONE;
+                    }
 
-                if (y - i >= 0 && x + i < width) {
-                    if (field[y - i][x + i] != null && field[y - i][x + i] != Figure.NONE) return null;
-                    field[y - i][x + i] = Figure.NONE;
-                }
-            }
-        }
-        if (figure == Figure.ROOK) {
-            for (int i = 0; i < height; i++) {
-                if (field[i][x] != null && field[i][x] != Figure.NONE) return null;
-                field[i][x] = Figure.NONE;
-            }
-            for (int i = 0; i < width; i++) {
-                if (field[y][i] != null && field[y][i] != Figure.NONE) return null;
-                field[y][i] = Figure.NONE;
-            }
-        }
-        if (figure == Figure.BISHOP) {
-            for (int i = 0; i < val; i++) {
-                if (y + i < height && x + i < width) {
-                    if (field[y + i][x + i] != null && field[y + i][x + i] != Figure.NONE) return null;
-                    field[y + i][x + i] = Figure.NONE;
-                }
-
-                if (y - i >= 0 && x - i >= 0) {
-                    if (field[y - i][x - i] != null && field[y - i][x - i] != Figure.NONE) return null;
-                    field[y - i][x - i] = Figure.NONE;
-                }
-
-                if (y + i < height && x - i >= 0) {
-                    if (field[y + i][x - i] != null && field[y + i][x - i] != Figure.NONE) return null;
-                    field[y + i][x - i] = Figure.NONE;
-                }
-
-                if (y - i >= 0 && x + i < width) {
-                    if (field[y - i][x + i] != null && field[y - i][x + i] != Figure.NONE) return null;
-                    field[y - i][x + i] = Figure.NONE;
-                }
-            }
-        }
-        if (figure == Figure.KING) {
-            for (int _y = -1; _y <= 1; _y++) {
-                for (int _x = -1; _x <= 1; _x++) {
-                    if (_y == 0 && _x == 0) continue;
-                    if (_y + y >= 0 && _x + x >= 0 && _y + y < height && _x + x < width) {
-                        if (field[_y + y][_x + x] != null && field[_y + y][_x + x] != Figure.NONE) return null;
-                        field[_y + y][_x + x] = Figure.NONE;
+                    if (y - i >= 0 && x + i < width) {
+                        if (field[y - i][x + i] != null && field[y - i][x + i] != Figure.NONE) return null;
+                        field[y - i][x + i] = Figure.NONE;
                     }
                 }
             }
-        }
-        if (figure == Figure.KNIGHT) {
-            for (int _y = -2; _y <= 2; _y++) {
-                for (int _x = -2; _x <= 2; _x++) {
-                    if (Math.abs(_x) != Math.abs(_y) && _x != 0 && _y != 0) {
+            case ROOK: {
+                for (int i = 0; i < height; i++) {
+                    if (field[i][x] != null && field[i][x] != Figure.NONE) return null;
+                    field[i][x] = Figure.NONE;
+                }
+                for (int i = 0; i < width; i++) {
+                    if (field[y][i] != null && field[y][i] != Figure.NONE) return null;
+                    field[y][i] = Figure.NONE;
+                }
+            }
+            case BISHOP: {
+                for (int i = 0; i < val; i++) {
+                    if (y + i < height && x + i < width) {
+                        if (field[y + i][x + i] != null && field[y + i][x + i] != Figure.NONE) return null;
+                        field[y + i][x + i] = Figure.NONE;
+                    }
+
+                    if (y - i >= 0 && x - i >= 0) {
+                        if (field[y - i][x - i] != null && field[y - i][x - i] != Figure.NONE) return null;
+                        field[y - i][x - i] = Figure.NONE;
+                    }
+
+                    if (y + i < height && x - i >= 0) {
+                        if (field[y + i][x - i] != null && field[y + i][x - i] != Figure.NONE) return null;
+                        field[y + i][x - i] = Figure.NONE;
+                    }
+
+                    if (y - i >= 0 && x + i < width) {
+                        if (field[y - i][x + i] != null && field[y - i][x + i] != Figure.NONE) return null;
+                        field[y - i][x + i] = Figure.NONE;
+                    }
+                }
+            }
+            case KING: {
+                for (int _y = -1; _y <= 1; _y++) {
+                    for (int _x = -1; _x <= 1; _x++) {
+                        if (_y == 0 && _x == 0) continue;
                         if (_y + y >= 0 && _x + x >= 0 && _y + y < height && _x + x < width) {
-                            if (field[_y + y][_x + x] != null && field[_y + y][_x + x] != Figure.NONE)
-                                return null;
+                            if (field[_y + y][_x + x] != null && field[_y + y][_x + x] != Figure.NONE) return null;
                             field[_y + y][_x + x] = Figure.NONE;
+                        }
+                    }
+                }
+            }
+            case KNIGHT: {
+                for (int _y = -2; _y <= 2; _y++) {
+                    for (int _x = -2; _x <= 2; _x++) {
+                        if (Math.abs(_x) != Math.abs(_y) && _x != 0 && _y != 0) {
+                            if (_y + y >= 0 && _x + x >= 0 && _y + y < height && _x + x < width) {
+                                if (field[_y + y][_x + x] != null && field[_y + y][_x + x] != Figure.NONE)
+                                    return null;
+                                field[_y + y][_x + x] = Figure.NONE;
+                            }
                         }
                     }
                 }
             }
         }
         field[y][x] = figure;
-        //Main.printField(fieldClone);
         return field;
     }
 
