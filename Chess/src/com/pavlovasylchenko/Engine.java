@@ -1,6 +1,7 @@
 package com.pavlovasylchenko;
 
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class Engine {
 
@@ -10,7 +11,7 @@ public class Engine {
 
     List<Figure> figures;
     //int iter = 0;
-    int wins = 0;
+    AtomicInteger wins = new AtomicInteger(0);
     Set<Field> results = new HashSet<>();
 
     public Engine(int width, int height, List<Figure> figures) {
@@ -20,16 +21,39 @@ public class Engine {
         //results = java.util.Collections.synchronizedSet(results);
     }
 
-    public Set<Field> getResult() {
+    public Set<Field> getResult(boolean multi) {
         List<Figure> figuresList = new ArrayList<>();
         figuresList.addAll(figures);
         Figure fig = figuresList.remove(0);
         Figure[] f = figuresList.toArray(new Figure[figuresList.size()]);
+        List<Thread> threads = new ArrayList<>();
         for (int y = 0; y < height; y++) {
             for (int x = 0; x < width; x++) {
                 Figure[][] field = new Figure[height][width];
                 field = fillConstraints(y, x, fig, field);
-                process(0, 0, f, field);
+                final Figure[][] finalField = field;
+                if(multi) {
+                    threads.add(new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                            process(0, 0, f, finalField);
+                        }
+                    }));
+                } else {
+                    process(0, 0, f, finalField);
+                }
+            }
+        }
+        if(multi) {
+            for (Thread thrd : threads) {
+                thrd.start();
+            }
+            for (Thread thrd : threads) {
+                try {
+                    thrd.join();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
             }
         }
         System.out.println("Всего вариантов с повторениями " + wins);
@@ -52,8 +76,10 @@ public class Engine {
                 if (figuresLeft.length == 1) {
                     //System.out.println(iter);
                     //Main.printField(result);
-                    results.add(new Field(result));
-                    wins++;
+                    synchronized (Engine.class) {
+                        results.add(new Field(result));
+                    }
+                    wins.incrementAndGet();
                 } else {
                     // Попробовать создать отдельный сет который будет содержать комбинации и проверять если такая комбинация была то не трогать
                     process(0, 0, Arrays.copyOfRange(figuresLeft, 1, figuresLeft.length), result);

@@ -16,7 +16,7 @@ public class Main {
                 Figure.KNIGHT
         ));
         long first = System.currentTimeMillis();
-        Set<Field> results = engine.getResult();
+        Set<Field> results = engine.getResult(true);
         long last = System.currentTimeMillis();
         System.out.println(((last - first)) / 1000d + " секунды");
         System.out.println("Найдено количество: " + results.size());
