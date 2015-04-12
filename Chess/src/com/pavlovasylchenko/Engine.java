@@ -1,8 +1,6 @@
 package com.pavlovasylchenko;
 
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 public class Engine {
 
@@ -12,17 +10,18 @@ public class Engine {
 
     List<Figure> figures;
 
-    List<FigureType[][]> results = new ArrayList<>();
+    Set<Figure[][]> results = new HashSet<>();
 
     public Engine(int width, int height, List<Figure> figures) {
         this.width = width;
         this.height = height;
         this.figures = figures;
+        results = java.util.Collections.synchronizedSet(results);
     }
 
-    public List<FigureType[][]> getResult() {
-        FigureType[][] field = new FigureType[height][width];
-        ArrayList<Figure> f = new ArrayList<>(figures.size());
+    public Set<Figure[][]> getResult() {
+        Figure[][] field = new Figure[height][width];
+        Vector<Figure> f = new Vector<>(figures.size());
         f.addAll(figures);
         process(0, 0, f, field);
         return results;
@@ -31,28 +30,26 @@ public class Engine {
     private void process(int y, //Позиция y
                          int x, //Позиция x
                          List<Figure> figuresLeft, //Фигуры в очереди
-                         FigureType[][] nextField //Частично заполненное поле с заполненными NONE
+                         Figure[][] nextField //Частично заполненное поле с заполненными NONE
     ) {
         //System.out.println("[" + y + ":" + x + "]");
         //printField(nextField);
         Figure figure = figuresLeft.remove(0);
         if (nextField[y][x] == null) {
             //Можно ставить
-            FigureType[][] result = fillConstraints(y, x, figure.getFigureType(), arrCopy(nextField));
+            Figure[][] result = fillConstraints(y, x, figure, arrCopy(nextField));
             if (result != null) {
-                LinkedList<Figure> list = new LinkedList<>();
+                Vector<Figure> list = new Vector<>();
                 list.addAll(figuresLeft);
                 if (figuresLeft.size() == 0) {
                     results.add(result.clone());
-                } else if (x < width - 1) {
-                    process(y, x + 1, list, result);
-                } else if (y < height - 1) {
-                    process(y + 1, 0, list, result);
+                } else {
+                    process(0, 0, list, result);
                 }
             }
         }
         figuresLeft.add(0, figure);
-        LinkedList<Figure> list = new LinkedList<>();
+        Vector<Figure> list = new Vector<>();
         list.addAll(figuresLeft);
         if (x < width - 1) {
             process(y, x + 1, list, nextField);
@@ -64,123 +61,106 @@ public class Engine {
         //если не получилось то x+1 или y+1
     }
 
-    private FigureType[][] fillConstraints(int y, int x, FigureType figureType, FigureType[][] fieldClone) {
+    private Figure[][] fillConstraints(int y, int x, Figure figure, Figure[][] fieldClone) {
         int val = height;
         if (width > height) val = width;
-        if (figureType == FigureType.QUEEN) {
+        if (figure == Figure.QUEEN) {
             for (int i = 0; i < val; i++) {
                 if (i < height) {
-                    if (fieldClone[i][x] != null && fieldClone[i][x] != FigureType.NONE) return null;
-                    fieldClone[i][x] = FigureType.NONE;
+                    if (fieldClone[i][x] != null && fieldClone[i][x] != Figure.NONE) return null;
+                    fieldClone[i][x] = Figure.NONE;
                 }
 
                 if (i < width) {
-                    if (i < width - 1 && fieldClone[y][i] != null && fieldClone[y][i] != FigureType.NONE) return null;
-                    fieldClone[y][i] = FigureType.NONE;
+                    if (i < width - 1 && fieldClone[y][i] != null && fieldClone[y][i] != Figure.NONE) return null;
+                    fieldClone[y][i] = Figure.NONE;
                 }
 
                 if (y + i < height && x + i < width) {
-                    if (fieldClone[y + i][x + i] != null && fieldClone[y + i][x + i] != FigureType.NONE) return null;
-                    fieldClone[y + i][x + i] = FigureType.NONE;
+                    if (fieldClone[y + i][x + i] != null && fieldClone[y + i][x + i] != Figure.NONE) return null;
+                    fieldClone[y + i][x + i] = Figure.NONE;
                 }
 
                 if (y - i >= 0 && x - i >= 0) {
-                    if (fieldClone[y - i][x - i] != null && fieldClone[y - i][x - i] != FigureType.NONE) return null;
-                    fieldClone[y - i][x - i] = FigureType.NONE;
+                    if (fieldClone[y - i][x - i] != null && fieldClone[y - i][x - i] != Figure.NONE) return null;
+                    fieldClone[y - i][x - i] = Figure.NONE;
                 }
 
                 if (y + i < height && x - i >= 0) {
-                    if (fieldClone[y + i][x - i] != null && fieldClone[y + i][x - i] != FigureType.NONE) return null;
-                    fieldClone[y + i][x - i] = FigureType.NONE;
+                    if (fieldClone[y + i][x - i] != null && fieldClone[y + i][x - i] != Figure.NONE) return null;
+                    fieldClone[y + i][x - i] = Figure.NONE;
                 }
 
                 if (y - i >= 0 && x + i < width) {
-                    if (fieldClone[y - i][x + i] != null && fieldClone[y - i][x + i] != FigureType.NONE) return null;
-                    fieldClone[y - i][x + i] = FigureType.NONE;
+                    if (fieldClone[y - i][x + i] != null && fieldClone[y - i][x + i] != Figure.NONE) return null;
+                    fieldClone[y - i][x + i] = Figure.NONE;
                 }
             }
         }
-        if (figureType == FigureType.ROOK) {
+        if (figure == Figure.ROOK) {
             for (int i = 0; i < val; i++) {
                 if (i < height) {
-                    if (fieldClone[i][x] != null && fieldClone[i][x] != FigureType.NONE) return null;
-                    fieldClone[i][x] = FigureType.NONE;
+                    if (fieldClone[i][x] != null && fieldClone[i][x] != Figure.NONE) return null;
+                    fieldClone[i][x] = Figure.NONE;
                 }
 
                 if (i < width) {
-                    if (fieldClone[y][i] != null && fieldClone[y][i] != FigureType.NONE) return null;
-                    fieldClone[y][i] = FigureType.NONE;
+                    if (fieldClone[y][i] != null && fieldClone[y][i] != Figure.NONE) return null;
+                    fieldClone[y][i] = Figure.NONE;
                 }
             }
         }
-        if (figureType == FigureType.BISHOP) {
+        if (figure == Figure.BISHOP) {
             for (int i = 0; i < val; i++) {
                 if (y + i < height && x + i < width) {
-                    if (fieldClone[y + i][x + i] != null && fieldClone[y + i][x + i] != FigureType.NONE) return null;
-                    fieldClone[y + i][x + i] = FigureType.NONE;
+                    if (fieldClone[y + i][x + i] != null && fieldClone[y + i][x + i] != Figure.NONE) return null;
+                    fieldClone[y + i][x + i] = Figure.NONE;
                 }
 
                 if (y - i >= 0 && x - i >= 0) {
-                    if (fieldClone[y - i][x - i] != null && fieldClone[y - i][x - i] != FigureType.NONE) return null;
-                    fieldClone[y - i][x - i] = FigureType.NONE;
+                    if (fieldClone[y - i][x - i] != null && fieldClone[y - i][x - i] != Figure.NONE) return null;
+                    fieldClone[y - i][x - i] = Figure.NONE;
                 }
 
                 if (y + i < height && x - i >= 0) {
-                    if (fieldClone[y + i][x - i] != null && fieldClone[y + i][x - i] != FigureType.NONE) return null;
-                    fieldClone[y + i][x - i] = FigureType.NONE;
+                    if (fieldClone[y + i][x - i] != null && fieldClone[y + i][x - i] != Figure.NONE) return null;
+                    fieldClone[y + i][x - i] = Figure.NONE;
                 }
 
                 if (y - i >= 0 && x + i < width) {
-                    if (fieldClone[y - i][x + i] != null && fieldClone[y - i][x + i] != FigureType.NONE) return null;
-                    fieldClone[y - i][x + i] = FigureType.NONE;
+                    if (fieldClone[y - i][x + i] != null && fieldClone[y - i][x + i] != Figure.NONE) return null;
+                    fieldClone[y - i][x + i] = Figure.NONE;
                 }
             }
         }
-        if (figureType == FigureType.KING) {
-            int i = 1;
-            if (fieldClone[i][x] != null && fieldClone[i][x] != FigureType.NONE) return null;
-            fieldClone[i][x] = FigureType.NONE;
-
-            if (fieldClone[y][i] != null && fieldClone[y][i] != FigureType.NONE) return null;
-            fieldClone[y][i] = FigureType.NONE;
-
-            if (y + i < height && x + i < width) {
-                if (fieldClone[y + i][x + i] != null && fieldClone[y + i][x + i] != FigureType.NONE) return null;
-                fieldClone[y + i][x + i] = FigureType.NONE;
-            }
-
-            if (y - i >= 0 && x - i >= 0) {
-                if (fieldClone[y - i][x - i] != null && fieldClone[y - i][x - i] != FigureType.NONE) return null;
-                fieldClone[y - i][x - i] = FigureType.NONE;
-            }
-
-            if (y + i < height && x - i >= 0) {
-                if (fieldClone[y + i][x - i] != null && fieldClone[y + i][x - i] != FigureType.NONE) return null;
-                fieldClone[y + i][x - i] = FigureType.NONE;
-            }
-
-            if (y - i >= 0 && x + i < width) {
-                if (fieldClone[y - i][x + i] != null && fieldClone[y - i][x + i] != FigureType.NONE) return null;
-                fieldClone[y - i][x + i] = FigureType.NONE;
+        if (figure == Figure.KING) {
+            for (int _y = -1; _y <= 1; _y++) {
+                for (int _x = -1; _x <= 1; _x++) {
+                    if (_y == 0 && _x == 0) continue;
+                    if (_y + y >= 0 && _x + x >= 0 && _y + y < height && _x + x < width) {
+                        fieldClone[_y + y][_x + x] = Figure.NONE;
+                    }
+                }
             }
         }
-        if (figureType == FigureType.KNIGHT) {
+        if (figure == Figure.KNIGHT) {
             for (int _y = -2; _y <= 2; _y++) {
                 for (int _x = -2; _x <= 2; _x++) {
                     if (Math.abs(_x) != Math.abs(_y) && _x != 0 && _y != 0) {
                         if (_y + y >= 0 && _x + x >= 0 && _y + y < height && _x + x < width) {
-                            fieldClone[_y + y][_x + x] = FigureType.NONE;
+                            fieldClone[_y + y][_x + x] = Figure.NONE;
                         }
                     }
                 }
             }
         }
-        fieldClone[y][x] = figureType;
+        fieldClone[y][x] = figure;
+        //Main.printField(fieldClone);
         return fieldClone;
     }
 
-    private FigureType[][] arrCopy(FigureType[][] arr) {
-        FigureType[][] newArr = new FigureType[arr.length][arr[0].length];
+    private Figure[][] arrCopy(Figure[][] arr) {
+        Figure[][] newArr = new Figure[arr.length][arr[0].length];
         for (int i = 0; i < arr.length; i++) {
             System.arraycopy(arr[i], 0, newArr[i], 0, arr[0].length);
         }

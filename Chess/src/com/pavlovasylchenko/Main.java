@@ -2,40 +2,40 @@ package com.pavlovasylchenko;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
 
 public class Main {
 
     public static void main(String[] args) {
-        Engine engine = new Engine(8, 8, Arrays.asList(
-                new Figure(FigureType.KING),
-                new Figure(FigureType.KING),
-                new Figure(FigureType.QUEEN),
-                new Figure(FigureType.QUEEN),
-                new Figure(FigureType.BISHOP),
-                new Figure(FigureType.BISHOP),
-                new Figure(FigureType.KNIGHT)
+        Engine engine = new Engine(6, 6, Arrays.asList(
+                Figure.QUEEN,
+                Figure.QUEEN,
+                Figure.QUEEN,
+                Figure.QUEEN,
+                Figure.QUEEN,
+                Figure.QUEEN
         ));
         long first = System.currentTimeMillis();
-        List<FigureType[][]> results = engine.getResult();
+        Set<Figure[][]> results = engine.getResult();
         long last = System.currentTimeMillis();
         System.out.println(((last - first)) / 1000d + " секунды");
         System.out.println("Найдено количество: " + results.size());
-        for (FigureType[][] resultField : results) {
+        for (Figure[][] resultField : results) {
             //printField(resultField);
         }
     }
 
-    private static void printField(FigureType[][] field) {
+    public static void printField(Figure[][] field) {
         System.out.println("-------------------------");
-        for (FigureType[] aField : field) {
+        for (Figure[] aField : field) {
             System.out.print("|");
-            for (FigureType anAField : aField) {
-                if (anAField == FigureType.KING) System.out.print("♚|");
-                if (anAField == FigureType.QUEEN) System.out.print("♛|");
-                if (anAField == FigureType.ROOK) System.out.print("♜|");
-                if (anAField == FigureType.KNIGHT) System.out.print("♞|");
-                if (anAField == FigureType.BISHOP) System.out.print("♝|");
-                if (anAField == FigureType.NONE) System.out.print("-|");
+            for (Figure anAField : aField) {
+                if (anAField == Figure.KING) System.out.print("♚|");
+                if (anAField == Figure.QUEEN) System.out.print("♛|");
+                if (anAField == Figure.ROOK) System.out.print("♜|");
+                if (anAField == Figure.KNIGHT) System.out.print("♞|");
+                if (anAField == Figure.BISHOP) System.out.print("♝|");
+                if (anAField == Figure.NONE) System.out.print("-|");
                 if (anAField == null) System.out.print(" |");
             }
             System.out.println();

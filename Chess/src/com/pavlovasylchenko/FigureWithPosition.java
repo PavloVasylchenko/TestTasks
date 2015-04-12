@@ -6,12 +6,12 @@ public class FigureWithPosition {
 
     int posY;
 
-    FigureType figureType;
+    Figure figure;
 
-    public FigureWithPosition(int posY, int posX, FigureType figureType) {
+    public FigureWithPosition(int posY, int posX, Figure figure) {
         this.posX = posX;
         this.posY = posY;
-        this.figureType = figureType;
+        this.figure = figure;
     }
 
     public int getPosX() {
@@ -30,11 +30,11 @@ public class FigureWithPosition {
         this.posY = posY;
     }
 
-    public FigureType getFigureType() {
-        return figureType;
+    public Figure getFigure() {
+        return figure;
     }
 
-    public void setFigureType(FigureType figureType) {
-        this.figureType = figureType;
+    public void setFigure(Figure figure) {
+        this.figure = figure;
     }
 }
