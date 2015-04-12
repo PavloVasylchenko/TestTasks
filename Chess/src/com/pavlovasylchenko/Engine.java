@@ -54,9 +54,9 @@ public class Engine {
         ArrayList<Figure> list = new ArrayList<>();
         list.addAll(figuresLeft);
         if (x < width - 1) {
-            process(y, x + 1, list, arrCopy(nextField));
+            process(y, x + 1, list, nextField);
         } else if (y < height - 1) {
-            process(y + 1, 0, list, arrCopy(nextField));
+            process(y + 1, 0, list, nextField);
         }
         //Пробуем ставить
         //Если получилось то вызываем с меньшим количеством
@@ -161,6 +161,17 @@ public class Engine {
             if (y - i >= 0 && x + i < width) {
                 if (fieldClone[y - i][x + i] != null && fieldClone[y - i][x + i] != FigureType.NONE) return null;
                 fieldClone[y - i][x + i] = FigureType.NONE;
+            }
+        }
+        if (figureType == FigureType.KNIGHT) {
+            for (int _y = -2; _y <= 2; _y++) {
+                for (int _x = -2; _x <= 2; _x++) {
+                    if (Math.abs(_x) != Math.abs(_y) && _x != 0 && _y != 0) {
+                        if (_y + y >= 0 && _x + x >= 0 && _y + y < height && _x + x < width) {
+                            fieldClone[_y + y][_x + x] = FigureType.NONE;
+                        }
+                    }
+                }
             }
         }
         fieldClone[y][x] = figureType;

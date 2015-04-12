@@ -6,22 +6,24 @@ import java.util.List;
 public class Main {
 
     public static void main(String[] args) {
-        Engine engine = new Engine(6, 6, Arrays.asList(
-                new Figure(FigureType.ROOK),
-                new Figure(FigureType.ROOK),
-                new Figure(FigureType.ROOK),
-                new Figure(FigureType.ROOK),
-                new Figure(FigureType.ROOK),
-                new Figure(FigureType.ROOK)
+        Engine engine = new Engine(8, 8, Arrays.asList(
+                new Figure(FigureType.QUEEN),
+                new Figure(FigureType.QUEEN),
+                new Figure(FigureType.QUEEN),
+                new Figure(FigureType.QUEEN),
+                new Figure(FigureType.QUEEN),
+                new Figure(FigureType.QUEEN),
+                new Figure(FigureType.QUEEN),
+                new Figure(FigureType.QUEEN)
         ));
         long first = System.currentTimeMillis();
         List<FigureType[][]> results = engine.getResult();
-        System.out.println("Найдено количество: " + results.size());
-        for (FigureType[][] resultField : results) {
-            printField(resultField);
-        }
         long last = System.currentTimeMillis();
         System.out.println(((last - first)) / 1000d + " секунды");
+        System.out.println("Найдено количество: " + results.size());
+        for (FigureType[][] resultField : results) {
+            //printField(resultField);
+        }
     }
 
     private static void printField(FigureType[][] field) {
