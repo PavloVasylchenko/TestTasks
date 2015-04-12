@@ -21,17 +21,17 @@ public class Engine {
     }
 
     public Set<Field> getResult(boolean multi) {
-        List<Figure> figuresList = new ArrayList<>();
+        final List<Figure> figuresList = new ArrayList<>();
         figuresList.addAll(figures);
-        Figure fig = figuresList.remove(0);
-        Figure[] f = figuresList.toArray(new Figure[figuresList.size()]);
-        List<Thread> threads = new ArrayList<>();
+        final Figure fig = figuresList.remove(0);
+        final Figure[] f = figuresList.toArray(new Figure[figuresList.size()]);
+        final List<Thread> threads = new ArrayList<>();
         for (int y = 0; y < height; y++) {
             for (int x = 0; x < width; x++) {
                 Figure[][] field = new Figure[height][width];
                 field = fillConstraints(y, x, fig, field);
                 final Figure[][] finalField = field;
-                if(multi) {
+                if (multi) {
                     threads.add(new Thread(new Runnable() {
                         @Override
                         public void run() {
@@ -43,7 +43,7 @@ public class Engine {
                 }
             }
         }
-        if(multi) {
+        if (multi) {
             for (Thread thrd : threads) {
                 thrd.start();
             }
@@ -64,10 +64,10 @@ public class Engine {
                          Figure[] figuresLeft, //Фигуры в очереди
                          Figure[][] nextField //Частично заполненное поле с заполненными NONE
     ) {
-        Figure figure = figuresLeft[0];
+        final Figure figure = figuresLeft[0];
         if (nextField[y][x] == null) {
             //Можно ставить
-            Figure[][] result = fillConstraints(y, x, figure, arrCopy(nextField));
+            final Figure[][] result = fillConstraints(y, x, figure, arrCopy(nextField));
             if (result != null) {
                 if (figuresLeft.length == 1) {
                     synchronized (Engine.class) {
@@ -88,25 +88,21 @@ public class Engine {
 
     //Немного страшный метод который не хочется делить потому что тогда непонятно что он делает :)
     private Figure[][] fillConstraints(int y, int x, Figure figure, Figure[][] field) {
-        int val = height;
-        if (width > height) val = width;
+        final int val = width > height ? width : height;
         if (figure == Figure.QUEEN) {
             for (int i = 0; i < height; i++) {
                 if (field[i][x] != null && field[i][x] != Figure.NONE) return null;
                 field[i][x] = Figure.NONE;
             }
             for (int i = 0; i < width; i++) {
-                if (i < width) {
-                    if (field[y][i] != null && field[y][i] != Figure.NONE) return null;
-                    field[y][i] = Figure.NONE;
-                }
+                if (field[y][i] != null && field[y][i] != Figure.NONE) return null;
+                field[y][i] = Figure.NONE;
             }
             for (int i = 0; i < val; i++) {
                 if (y + i < height && x + i < width) {
                     if (field[y + i][x + i] != null && field[y + i][x + i] != Figure.NONE) return null;
                     field[y + i][x + i] = Figure.NONE;
                 }
-
                 if (y - i >= 0 && x - i >= 0) {
                     if (field[y - i][x - i] != null && field[y - i][x - i] != Figure.NONE) return null;
                     field[y - i][x - i] = Figure.NONE;
@@ -129,10 +125,8 @@ public class Engine {
                 field[i][x] = Figure.NONE;
             }
             for (int i = 0; i < width; i++) {
-                if (i < width) {
-                    if (field[y][i] != null && field[y][i] != Figure.NONE) return null;
-                    field[y][i] = Figure.NONE;
-                }
+                if (field[y][i] != null && field[y][i] != Figure.NONE) return null;
+                field[y][i] = Figure.NONE;
             }
         }
         if (figure == Figure.BISHOP) {

@@ -6,7 +6,7 @@ import java.util.Set;
 public class Main {
 
     public static void main(String[] args) {
-        Engine engine = new Engine(6, 6, Arrays.asList(
+        Engine engine = new Engine(6, 7, Arrays.asList(
                 Figure.QUEEN,
                 Figure.QUEEN,
                 Figure.KING,
@@ -16,7 +16,7 @@ public class Main {
                 Figure.KNIGHT
         ));
         long first = System.currentTimeMillis();
-        Set<Field> results = engine.getResult(true);
+        Set<Field> results = engine.getResult(false);
         long last = System.currentTimeMillis();
         System.out.println(((last - first)) / 1000d + " секунды");
         System.out.println("Найдено количество: " + results.size());
