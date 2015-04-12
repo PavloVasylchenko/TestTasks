@@ -37,12 +37,12 @@ public class Engine {
                 field = fillConstraints(y, x, fig, field);
                 final Figure[][] finalField = field;
                 if (multithreading) {
-                    futures.add(executor.submit(new Thread(new Runnable() {
+                    futures.add(executor.submit(new Runnable() {
                         @Override
                         public void run() {
                             process(0, 0, f, finalField);
                         }
-                    })));
+                    }));
                 } else {
                     process(0, 0, f, finalField);
                 }
