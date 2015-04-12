@@ -17,7 +17,7 @@ public class Engine {
     AtomicInteger wins = new AtomicInteger(0);
     Set<Field> results = new HashSet<>();
 
-    ExecutorService executor = Executors.newFixedThreadPool(4);
+    ExecutorService executor;
 
     public Engine(int width, int height, List<Figure> figures) {
         this.width = width;
@@ -26,6 +26,7 @@ public class Engine {
     }
 
     public Set<Field> getResult(boolean multithreading) {
+        executor = Executors.newFixedThreadPool(4);
         final List<Figure> figuresList = new ArrayList<>();
         figuresList.addAll(figures);
         final Figure fig = figuresList.remove(0);
@@ -60,6 +61,7 @@ public class Engine {
             }
         }
         System.out.println("Всего вариантов с повторениями " + wins);
+        executor.shutdown();
         return results;
     }
 
@@ -91,106 +93,99 @@ public class Engine {
         }
     }
 
-    // Немного страшный метод который не хочется делить потому что тогда непонятно что он делает :)
     // В места которые нельзя ставить фигуры ставим NONE, фигуры ставить можно только в места null.
     private Figure[][] fillConstraints(int y, int x, Figure figure, Figure[][] field) {
         final int val = width > height ? width : height;
         switch (figure) {
             case QUEEN: {
-                for (int i = 0; i < height; i++) {
-                    if (field[i][x] != null && field[i][x] != Figure.NONE) return null;
-                    field[i][x] = Figure.NONE;
-                }
-                for (int i = 0; i < width; i++) {
-                    if (field[y][i] != null && field[y][i] != Figure.NONE) return null;
-                    field[y][i] = Figure.NONE;
-                }
-                for (int i = 0; i < val; i++) {
-                    if (y + i < height && x + i < width) {
-                        if (field[y + i][x + i] != null && field[y + i][x + i] != Figure.NONE) return null;
-                        field[y + i][x + i] = Figure.NONE;
-                    }
-                    if (y - i >= 0 && x - i >= 0) {
-                        if (field[y - i][x - i] != null && field[y - i][x - i] != Figure.NONE) return null;
-                        field[y - i][x - i] = Figure.NONE;
-                    }
-
-                    if (y + i < height && x - i >= 0) {
-                        if (field[y + i][x - i] != null && field[y + i][x - i] != Figure.NONE) return null;
-                        field[y + i][x - i] = Figure.NONE;
-                    }
-
-                    if (y - i >= 0 && x + i < width) {
-                        if (field[y - i][x + i] != null && field[y - i][x + i] != Figure.NONE) return null;
-                        field[y - i][x + i] = Figure.NONE;
-                    }
-                }
+                if (!checkRook(y, x, field) || !checkBishop(y, x, field)) return null;
                 break;
             }
             case ROOK: {
-                for (int i = 0; i < height; i++) {
-                    if (field[i][x] != null && field[i][x] != Figure.NONE) return null;
-                    field[i][x] = Figure.NONE;
-                }
-                for (int i = 0; i < width; i++) {
-                    if (field[y][i] != null && field[y][i] != Figure.NONE) return null;
-                    field[y][i] = Figure.NONE;
-                }
+                if (!checkRook(y, x, field)) return null;
                 break;
             }
             case BISHOP: {
-                for (int i = 0; i < val; i++) {
-                    if (y + i < height && x + i < width) {
-                        if (field[y + i][x + i] != null && field[y + i][x + i] != Figure.NONE) return null;
-                        field[y + i][x + i] = Figure.NONE;
-                    }
-
-                    if (y - i >= 0 && x - i >= 0) {
-                        if (field[y - i][x - i] != null && field[y - i][x - i] != Figure.NONE) return null;
-                        field[y - i][x - i] = Figure.NONE;
-                    }
-
-                    if (y + i < height && x - i >= 0) {
-                        if (field[y + i][x - i] != null && field[y + i][x - i] != Figure.NONE) return null;
-                        field[y + i][x - i] = Figure.NONE;
-                    }
-
-                    if (y - i >= 0 && x + i < width) {
-                        if (field[y - i][x + i] != null && field[y - i][x + i] != Figure.NONE) return null;
-                        field[y - i][x + i] = Figure.NONE;
-                    }
-                }
+                if (!checkBishop(y, x, field)) return null;
                 break;
             }
             case KING: {
-                for (int _y = -1; _y <= 1; _y++) {
-                    for (int _x = -1; _x <= 1; _x++) {
-                        if (_y == 0 && _x == 0) continue;
-                        if (_y + y >= 0 && _x + x >= 0 && _y + y < height && _x + x < width) {
-                            if (field[_y + y][_x + x] != null && field[_y + y][_x + x] != Figure.NONE) return null;
-                            field[_y + y][_x + x] = Figure.NONE;
-                        }
-                    }
-                }
+                if (!checkKing(y, x, field)) return null;
                 break;
             }
             case KNIGHT: {
-                for (int _y = -2; _y <= 2; _y++) {
-                    for (int _x = -2; _x <= 2; _x++) {
-                        if (Math.abs(_x) != Math.abs(_y) && _x != 0 && _y != 0) {
-                            if (_y + y >= 0 && _x + x >= 0 && _y + y < height && _x + x < width) {
-                                if (field[_y + y][_x + x] != null && field[_y + y][_x + x] != Figure.NONE)
-                                    return null;
-                                field[_y + y][_x + x] = Figure.NONE;
-                            }
-                        }
-                    }
-                }
+                if (!checkKnight(y, x, field)) return null;
                 break;
             }
         }
         field[y][x] = figure;
         return field;
+    }
+
+    private boolean checkKnight(int y, int x, Figure[][] field) {
+        for (int _y = -2; _y <= 2; _y++) {
+            for (int _x = -2; _x <= 2; _x++) {
+                if (Math.abs(_x) != Math.abs(_y) && _x != 0 && _y != 0) {
+                    if (_y + y >= 0 && _x + x >= 0 && _y + y < height && _x + x < width) {
+                        if (field[_y + y][_x + x] != null && field[_y + y][_x + x] != Figure.NONE)
+                            return false;
+                        field[_y + y][_x + x] = Figure.NONE;
+                    }
+                }
+            }
+        }
+        return true;
+    }
+
+    private boolean checkKing(int y, int x, Figure[][] field) {
+        for (int _y = -1; _y <= 1; _y++) {
+            for (int _x = -1; _x <= 1; _x++) {
+                if (_y == 0 && _x == 0) continue;
+                if (_y + y >= 0 && _x + x >= 0 && _y + y < height && _x + x < width) {
+                    if (field[_y + y][_x + x] != null && field[_y + y][_x + x] != Figure.NONE) return false;
+                    field[_y + y][_x + x] = Figure.NONE;
+                }
+            }
+        }
+        return true;
+    }
+
+    private boolean checkBishop(int y, int x, Figure[][] field) {
+        final int val = width > height ? width : height;
+        for (int i = 0; i < val; i++) {
+            if (y + i < height && x + i < width) {
+                if (field[y + i][x + i] != null && field[y + i][x + i] != Figure.NONE) return false;
+                field[y + i][x + i] = Figure.NONE;
+            }
+
+            if (y - i >= 0 && x - i >= 0) {
+                if (field[y - i][x - i] != null && field[y - i][x - i] != Figure.NONE) return false;
+                field[y - i][x - i] = Figure.NONE;
+            }
+
+            if (y + i < height && x - i >= 0) {
+                if (field[y + i][x - i] != null && field[y + i][x - i] != Figure.NONE) return false;
+                field[y + i][x - i] = Figure.NONE;
+            }
+
+            if (y - i >= 0 && x + i < width) {
+                if (field[y - i][x + i] != null && field[y - i][x + i] != Figure.NONE) return false;
+                field[y - i][x + i] = Figure.NONE;
+            }
+        }
+        return true;
+    }
+
+    private boolean checkRook(int y, int x, Figure[][] field) {
+        for (int i = 0; i < height; i++) {
+            if (field[i][x] != null && field[i][x] != Figure.NONE) return false;
+            field[i][x] = Figure.NONE;
+        }
+        for (int i = 0; i < width; i++) {
+            if (field[y][i] != null && field[y][i] != Figure.NONE) return false;
+            field[y][i] = Figure.NONE;
+        }
+        return true;
     }
 
     private Figure[][] arrCopy(Figure[][] arr) {
