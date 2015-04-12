@@ -7,14 +7,13 @@ public class Main {
 
     public static void main(String[] args) {
         Engine engine = new Engine(8, 8, Arrays.asList(
+                new Figure(FigureType.KING),
+                new Figure(FigureType.KING),
                 new Figure(FigureType.QUEEN),
                 new Figure(FigureType.QUEEN),
-                new Figure(FigureType.QUEEN),
-                new Figure(FigureType.QUEEN),
-                new Figure(FigureType.QUEEN),
-                new Figure(FigureType.QUEEN),
-                new Figure(FigureType.QUEEN),
-                new Figure(FigureType.QUEEN)
+                new Figure(FigureType.BISHOP),
+                new Figure(FigureType.BISHOP),
+                new Figure(FigureType.KNIGHT)
         ));
         long first = System.currentTimeMillis();
         List<FigureType[][]> results = engine.getResult();

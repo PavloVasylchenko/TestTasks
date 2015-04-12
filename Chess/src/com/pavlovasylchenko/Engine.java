@@ -1,6 +1,7 @@
 package com.pavlovasylchenko;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 public class Engine {
@@ -39,7 +40,7 @@ public class Engine {
             //Можно ставить
             FigureType[][] result = fillConstraints(y, x, figure.getFigureType(), arrCopy(nextField));
             if (result != null) {
-                ArrayList<Figure> list = new ArrayList<>();
+                LinkedList<Figure> list = new LinkedList<>();
                 list.addAll(figuresLeft);
                 if (figuresLeft.size() == 0) {
                     results.add(result.clone());
@@ -50,8 +51,8 @@ public class Engine {
                 }
             }
         }
-        figuresLeft.add(figure);
-        ArrayList<Figure> list = new ArrayList<>();
+        figuresLeft.add(0, figure);
+        LinkedList<Figure> list = new LinkedList<>();
         list.addAll(figuresLeft);
         if (x < width - 1) {
             process(y, x + 1, list, nextField);
