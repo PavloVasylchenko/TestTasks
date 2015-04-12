@@ -1,7 +1,10 @@
 package com.pavlovasylchenko;
 
 import java.util.*;
-import java.util.concurrent.*;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class Engine {
@@ -67,7 +70,7 @@ public class Engine {
     ) {
         final Figure figure = figuresLeft[0];
         if (nextField[y][x] == null) {
-            //Можно ставить
+            //Можно ставить, ставим фигуру и запускаем отдельную ветку вычислений
             final Figure[][] result = fillConstraints(y, x, figure, arrCopy(nextField));
             if (result != null) {
                 if (figuresLeft.length == 1) {
@@ -80,6 +83,7 @@ public class Engine {
                 }
             }
         }
+        //Перебираем все поле
         if (x < width - 1) {
             process(y, x + 1, figuresLeft, nextField);
         } else if (y < height - 1) {
@@ -87,7 +91,8 @@ public class Engine {
         }
     }
 
-    //Немного страшный метод который не хочется делить потому что тогда непонятно что он делает :)
+    // Немного страшный метод который не хочется делить потому что тогда непонятно что он делает :)
+    // В места которые нельзя ставить фигуры ставим NONE, фигуры ставить можно только в места null.
     private Figure[][] fillConstraints(int y, int x, Figure figure, Figure[][] field) {
         final int val = width > height ? width : height;
         if (figure == Figure.QUEEN) {
