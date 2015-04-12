@@ -21,10 +21,17 @@ public class Engine {
     }
 
     public Set<Field> getResult() {
-        Figure[][] field = new Figure[height][width];
-        Vector<Figure> f = new Vector<>(figures.size());
-        f.addAll(figures);
-        process(0, 0, f.toArray(new Figure[figures.size()]), field);
+        List<Figure> figuresList = new ArrayList<>();
+        figuresList.addAll(figures);
+        Figure fig = figuresList.remove(0);
+        Figure[] f = figuresList.toArray(new Figure[figuresList.size()]);
+        for (int y = 0; y < height; y++) {
+            for (int x = 0; x < width; x++) {
+                Figure[][] field = new Figure[height][width];
+                field = fillConstraints(y, x, fig, field);
+                process(0, 0, f, field);
+            }
+        }
         System.out.println("Всего вариантов с повторениями " + wins);
         return results;
     }
