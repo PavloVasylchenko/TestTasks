@@ -5,6 +5,13 @@ import java.util.Set;
 
 public class Main {
 
+    /*
+        Result:
+
+        Всего вариантов с повторениями 24510624
+        102.015 секунды
+        Найдено количество: 3063828
+     */
     // javac -d out src/com/**/*.java
     // java -cp out/ com.pavlovasylchenko.Main
     public static void main(String[] args) {
