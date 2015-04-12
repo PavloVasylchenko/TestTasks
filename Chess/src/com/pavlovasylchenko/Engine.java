@@ -18,7 +18,6 @@ public class Engine {
         this.width = width;
         this.height = height;
         this.figures = figures;
-        //results = java.util.Collections.synchronizedSet(results);
     }
 
     public Set<Field> getResult(boolean multi) {
@@ -65,23 +64,17 @@ public class Engine {
                          Figure[] figuresLeft, //Фигуры в очереди
                          Figure[][] nextField //Частично заполненное поле с заполненными NONE
     ) {
-        //System.out.println("[" + y + ":" + x + "]");
-        //printField(nextField);
-        //iter++;
         Figure figure = figuresLeft[0];
         if (nextField[y][x] == null) {
             //Можно ставить
             Figure[][] result = fillConstraints(y, x, figure, arrCopy(nextField));
             if (result != null) {
                 if (figuresLeft.length == 1) {
-                    //System.out.println(iter);
-                    //Main.printField(result);
                     synchronized (Engine.class) {
                         results.add(new Field(result));
                     }
                     wins.incrementAndGet();
                 } else {
-                    // Попробовать создать отдельный сет который будет содержать комбинации и проверять если такая комбинация была то не трогать
                     process(0, 0, Arrays.copyOfRange(figuresLeft, 1, figuresLeft.length), result);
                 }
             }
@@ -93,6 +86,7 @@ public class Engine {
         }
     }
 
+    //Немного страшный метод который не хочется делить потому что тогда непонятно что он делает :)
     private Figure[][] fillConstraints(int y, int x, Figure figure, Figure[][] field) {
         int val = height;
         if (width > height) val = width;
