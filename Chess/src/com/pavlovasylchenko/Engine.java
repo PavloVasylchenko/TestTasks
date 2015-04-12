@@ -1,6 +1,7 @@
 package com.pavlovasylchenko;
 
 import java.util.*;
+import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class Engine {
@@ -10,9 +11,10 @@ public class Engine {
     int height;
 
     List<Figure> figures;
-    //int iter = 0;
     AtomicInteger wins = new AtomicInteger(0);
     Set<Field> results = new HashSet<>();
+
+    ExecutorService executor = Executors.newFixedThreadPool(4);
 
     public Engine(int width, int height, List<Figure> figures) {
         this.width = width;
@@ -25,32 +27,31 @@ public class Engine {
         figuresList.addAll(figures);
         final Figure fig = figuresList.remove(0);
         final Figure[] f = figuresList.toArray(new Figure[figuresList.size()]);
-        final List<Thread> threads = new ArrayList<>();
+        List<Future<?>> futures = new ArrayList<>();
         for (int y = 0; y < height; y++) {
             for (int x = 0; x < width; x++) {
                 Figure[][] field = new Figure[height][width];
                 field = fillConstraints(y, x, fig, field);
                 final Figure[][] finalField = field;
                 if (multithreading) {
-                    threads.add(new Thread(new Runnable() {
+                    futures.add(executor.submit(new Thread(new Runnable() {
                         @Override
                         public void run() {
                             process(0, 0, f, finalField);
                         }
-                    }));
+                    })));
                 } else {
                     process(0, 0, f, finalField);
                 }
             }
         }
         if (multithreading) {
-            for (Thread thrd : threads) {
-                thrd.start();
-            }
-            for (Thread thrd : threads) {
+            for (Future future : futures) {
                 try {
-                    thrd.join();
+                    future.get();
                 } catch (InterruptedException e) {
+                    e.printStackTrace();
+                } catch (ExecutionException e) {
                     e.printStackTrace();
                 }
             }
