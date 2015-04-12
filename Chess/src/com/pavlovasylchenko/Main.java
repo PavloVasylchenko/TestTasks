@@ -6,7 +6,7 @@ import java.util.Set;
 public class Main {
 
     public static void main(String[] args) {
-        Engine engine = new Engine(7, 6, Arrays.asList(
+        Engine engine = new Engine(7, 7, Arrays.asList(
                 Figure.QUEEN,
                 Figure.QUEEN,
                 Figure.KING,
