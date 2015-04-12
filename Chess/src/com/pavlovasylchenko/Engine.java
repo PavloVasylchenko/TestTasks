@@ -13,6 +13,7 @@ public class Engine {
 
     List<Figure> figures;
     //int iter = 0;
+    int wins = 0;
     Set<Field> results = new HashSet<>();
 
     public Engine(int width, int height, List<Figure> figures) {
@@ -27,6 +28,7 @@ public class Engine {
         Vector<Figure> f = new Vector<>(figures.size());
         f.addAll(figures);
         process(0, 0, f, field);
+        System.out.println("Всего вариантов с повторениями " + wins);
         return results;
     }
 
@@ -47,7 +49,9 @@ public class Engine {
                 list.addAll(figuresLeft);
                 if (figuresLeft.size() == 0) {
                     //System.out.println(iter);
+                    //Main.printField(result);
                     results.add(new Field(result));
+                    wins++;
                 } else {
                     // Попробовать создать отдельный сет который будет содержать комбинации и проверять если такая комбинация была то не трогать
                     process(0, 0, list, result);
