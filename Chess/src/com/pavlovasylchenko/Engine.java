@@ -1,6 +1,9 @@
 package com.pavlovasylchenko;
 
-import java.util.*;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.Vector;
 
 public class Engine {
 
@@ -9,17 +12,17 @@ public class Engine {
     int height;
 
     List<Figure> figures;
-
-    Set<Figure[][]> results = new HashSet<>();
+    //int iter = 0;
+    Set<Field> results = new HashSet<>();
 
     public Engine(int width, int height, List<Figure> figures) {
         this.width = width;
         this.height = height;
         this.figures = figures;
-        results = java.util.Collections.synchronizedSet(results);
+        //results = java.util.Collections.synchronizedSet(results);
     }
 
-    public Set<Figure[][]> getResult() {
+    public Set<Field> getResult() {
         Figure[][] field = new Figure[height][width];
         Vector<Figure> f = new Vector<>(figures.size());
         f.addAll(figures);
@@ -34,6 +37,7 @@ public class Engine {
     ) {
         //System.out.println("[" + y + ":" + x + "]");
         //printField(nextField);
+        //iter++;
         Figure figure = figuresLeft.remove(0);
         if (nextField[y][x] == null) {
             //Можно ставить
@@ -42,8 +46,10 @@ public class Engine {
                 Vector<Figure> list = new Vector<>();
                 list.addAll(figuresLeft);
                 if (figuresLeft.size() == 0) {
-                    results.add(result.clone());
+                    //System.out.println(iter);
+                    results.add(new Field(result));
                 } else {
+                    // Попробовать создать отдельный сет который будет содержать комбинации и проверять если такая комбинация была то не трогать
                     process(0, 0, list, result);
                 }
             }
@@ -56,9 +62,6 @@ public class Engine {
         } else if (y < height - 1) {
             process(y + 1, 0, list, nextField);
         }
-        //Пробуем ставить
-        //Если получилось то вызываем с меньшим количеством
-        //если не получилось то x+1 или y+1
     }
 
     private Figure[][] fillConstraints(int y, int x, Figure figure, Figure[][] fieldClone) {
@@ -72,7 +75,7 @@ public class Engine {
                 }
 
                 if (i < width) {
-                    if (i < width - 1 && fieldClone[y][i] != null && fieldClone[y][i] != Figure.NONE) return null;
+                    if (fieldClone[y][i] != null && fieldClone[y][i] != Figure.NONE) return null;
                     fieldClone[y][i] = Figure.NONE;
                 }
 
@@ -138,6 +141,7 @@ public class Engine {
                 for (int _x = -1; _x <= 1; _x++) {
                     if (_y == 0 && _x == 0) continue;
                     if (_y + y >= 0 && _x + x >= 0 && _y + y < height && _x + x < width) {
+                        if (fieldClone[_y + y][_x + x] != null && fieldClone[_y + y][_x + x] != Figure.NONE) return null;
                         fieldClone[_y + y][_x + x] = Figure.NONE;
                     }
                 }
@@ -148,6 +152,8 @@ public class Engine {
                 for (int _x = -2; _x <= 2; _x++) {
                     if (Math.abs(_x) != Math.abs(_y) && _x != 0 && _y != 0) {
                         if (_y + y >= 0 && _x + x >= 0 && _y + y < height && _x + x < width) {
+                            if (fieldClone[_y + y][_x + x] != null && fieldClone[_y + y][_x + x] != Figure.NONE)
+                                return null;
                             fieldClone[_y + y][_x + x] = Figure.NONE;
                         }
                     }
