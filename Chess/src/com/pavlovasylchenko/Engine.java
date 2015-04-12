@@ -125,6 +125,7 @@ public class Engine {
                         field[y - i][x + i] = Figure.NONE;
                     }
                 }
+                break;
             }
             case ROOK: {
                 for (int i = 0; i < height; i++) {
@@ -135,6 +136,7 @@ public class Engine {
                     if (field[y][i] != null && field[y][i] != Figure.NONE) return null;
                     field[y][i] = Figure.NONE;
                 }
+                break;
             }
             case BISHOP: {
                 for (int i = 0; i < val; i++) {
@@ -158,6 +160,7 @@ public class Engine {
                         field[y - i][x + i] = Figure.NONE;
                     }
                 }
+                break;
             }
             case KING: {
                 for (int _y = -1; _y <= 1; _y++) {
@@ -169,6 +172,7 @@ public class Engine {
                         }
                     }
                 }
+                break;
             }
             case KNIGHT: {
                 for (int _y = -2; _y <= 2; _y++) {
@@ -182,6 +186,7 @@ public class Engine {
                         }
                     }
                 }
+                break;
             }
         }
         field[y][x] = figure;
