@@ -7,12 +7,28 @@ public class Main {
     /*
         Result:
 
-        Всего вариантов с повторениями 24510624
-        102.015 секунды
-        Найдено количество: 3063828
      */
     // javac -d out src/com/**/*.java
     // java -cp out/ com.pavlovasylchenko.Main
+//    public static void main(String[] args) {
+//
+//        Engine engine = new Engine(7, 7, Arrays.asList(
+//                Figure.QUEEN,
+//                Figure.QUEEN,
+//                Figure.BISHOP,
+//                Figure.BISHOP,
+//                Figure.KNIGHT,
+//                Figure.KING,
+//                Figure.KING
+//        ));
+//
+//        long first = System.currentTimeMillis();
+//        List<Field> results = engine.getResult(true);
+//        long last = System.currentTimeMillis();
+//        System.out.println(((last - first)) / 1000d + " секунды");
+//        System.out.println("Найдено количество: " + results.size());
+//    }
+
     public static void main(String[] args) {
 
         ReadInput readInput = new ReadInput().invoke();
@@ -23,13 +39,13 @@ public class Main {
 
         Engine engine = new Engine(width, height, figures);
         long first = System.currentTimeMillis();
-        Set<Field> results = engine.getResult(true);
+        List<Field> results = engine.getResult(true);
         long last = System.currentTimeMillis();
         System.out.println(((last - first)) / 1000d + " секунды");
-        System.out.println("Найдено количество: " + results.size());
-        for (Field resultField : results) {
+        //System.out.println("Найдено количество: " + results.size());
+        //for (Field resultField : results) {
             //printField(resultField.getFieldArray());
-        }
+        //}
     }
 
     public static void printField(Figure[][] field) {

@@ -1,6 +1,7 @@
 package com.pavlovasylchenko;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -13,39 +14,55 @@ public class Engine {
 
     int height;
 
-    List<Figure> figures;
+    Figure[] figures;
     AtomicInteger wins = new AtomicInteger(0);
-    Set<Field> results = new HashSet<>();
+    List<Field> results = new ArrayList<>();
 
+
+    List<Future<?>> futures = new ArrayList<>();
     ExecutorService executor;
 
     public Engine(int width, int height, List<Figure> figures) {
         this.width = width;
         this.height = height;
-        this.figures = figures;
+        this.figures = figures.toArray(new Figure[figures.size()]);
     }
 
-    public Set<Field> getResult(boolean multithreading) {
+    public List<Field> getResult(boolean multithreading) {
         executor = Executors.newFixedThreadPool(4);
-        final List<Figure> figuresList = new ArrayList<>();
-        figuresList.addAll(figures);
-        final Figure fig = figuresList.remove(0);
-        final Figure[] f = figuresList.toArray(new Figure[figuresList.size()]);
-        List<Future<?>> futures = new ArrayList<>();
+
         for (int y = 0; y < height; y++) {
             for (int x = 0; x < width; x++) {
                 Figure[][] field = new Figure[height][width];
-                field = fillConstraints(y, x, fig, field);
+                field = fillConstraints(y, x, figures[0], field);
                 final Figure[][] finalField = field;
                 if (multithreading) {
+                    final int finalX = x;
+                    final int finalY = y;
                     futures.add(executor.submit(new Runnable() {
                         @Override
                         public void run() {
-                            process(0, 0, f, finalField);
+                            if (figures.length > 1 && figures[0] == figures[1]) {
+                                if (finalX < width - 1) {
+                                    process(finalY, finalX + 1, 1, finalField);
+                                } else if (finalY < height - 1) {
+                                    process(finalY + 1, 0, 1, finalField);
+                                }
+                            } else {
+                                process(0, 0, 1, finalField);
+                            }
                         }
                     }));
                 } else {
-                    process(0, 0, f, finalField);
+                    if (figures.length > 1 && figures[0] == figures[1]) {
+                        if (x < width - 1) {
+                            process(y, x + 1, 1, finalField);
+                        } else if (y < height - 1) {
+                            process(y + 1, 0, 1, finalField);
+                        }
+                    } else {
+                        process(0, 0, 1, finalField);
+                    }
                 }
             }
         }
@@ -60,36 +77,47 @@ public class Engine {
                 }
             }
         }
-        System.out.println("Всего вариантов с повторениями " + wins);
+        System.out.println("Всего вариантов: " + wins.get());
         executor.shutdown();
         return results;
     }
 
     private void process(int y, //Позиция y
                          int x, //Позиция x
-                         Figure[] figuresLeft, //Фигуры в очереди
+                         int position,
                          Figure[][] nextField //Частично заполненное поле с заполненными NONE
     ) {
-        final Figure figure = figuresLeft[0];
+//        if (position > figures.length - 1) {
+//            wins.incrementAndGet();
+//            return;
+//        }
         if (nextField[y][x] == null) {
             //Можно ставить, ставим фигуру и запускаем отдельную ветку вычислений
-            final Figure[][] result = fillConstraints(y, x, figure, arrCopy(nextField));
+            final Figure[][] result = fillConstraints(y, x, figures[position], arrCopy(nextField));
             if (result != null) {
-                if (figuresLeft.length == 1) {
-                    synchronized (Engine.class) {
-                        results.add(new Field(result));
-                    }
+                if (position > figures.length - 2) {
+                    //synchronized (Engine.class) {
+                    //   results.add(new Field(result));
+                    //}
                     wins.incrementAndGet();
                 } else {
-                    process(0, 0, Arrays.copyOfRange(figuresLeft, 1, figuresLeft.length), result);
+                    if (figures.length > position + 1 && figures[position] == figures[position + 1]) {
+                        if (x < width - 1) {
+                            process(y, x + 1, position + 1, result);
+                        } else if (y < height - 1) {
+                            process(y + 1, 0, position + 1, result);
+                        }
+                    } else {
+                        process(0, 0, position + 1, result);
+                    }
                 }
             }
         }
         //Перебираем все поле
         if (x < width - 1) {
-            process(y, x + 1, figuresLeft, nextField);
+            process(y, x + 1, position, nextField);
         } else if (y < height - 1) {
-            process(y + 1, 0, figuresLeft, nextField);
+            process(y + 1, 0, position, nextField);
         }
     }
 
