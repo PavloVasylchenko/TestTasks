@@ -33,36 +33,18 @@ public class Engine {
 
         for (int y = 0; y < height; y++) {
             for (int x = 0; x < width; x++) {
-                Figure[][] field = new Figure[height][width];
-                field = fillConstraints(y, x, figures[0], field);
-                final Figure[][] finalField = field;
+                final Figure[][] finalField = fillConstraints(y, x, figures[0], new Figure[height][width]);
                 if (multithreading) {
                     final int finalX = x;
                     final int finalY = y;
                     futures.add(executor.submit(new Runnable() {
                         @Override
                         public void run() {
-                            if (figures.length > 1 && figures[0] == figures[1]) {
-                                if (finalX < width - 1) {
-                                    process(finalY, finalX + 1, 1, finalField);
-                                } else if (finalY < height - 1) {
-                                    process(finalY + 1, 0, 1, finalField);
-                                }
-                            } else {
-                                process(0, 0, 1, finalField);
-                            }
+                            processBranch(finalY, finalX, 0, finalField);
                         }
                     }));
                 } else {
-                    if (figures.length > 1 && figures[0] == figures[1]) {
-                        if (x < width - 1) {
-                            process(y, x + 1, 1, finalField);
-                        } else if (y < height - 1) {
-                            process(y + 1, 0, 1, finalField);
-                        }
-                    } else {
-                        process(0, 0, 1, finalField);
-                    }
+                    processBranch(y, x, 0, finalField);
                 }
             }
         }
@@ -82,6 +64,14 @@ public class Engine {
         return results;
     }
 
+    /**
+     * Основной метод, вызывается рекурсивно и вытается ставить фигуры. Если фигура поставилась то
+     * добавляем к позиции +1 и запускаем выччисления отдельной веткой
+     * @param y
+     * @param x
+     * @param position
+     * @param nextField
+     */
     private void process(int y, //Позиция y
                          int x, //Позиция x
                          int position,
@@ -101,15 +91,7 @@ public class Engine {
                     //}
                     wins.incrementAndGet();
                 } else {
-                    if (figures.length > position + 1 && figures[position] == figures[position + 1]) {
-                        if (x < width - 1) {
-                            process(y, x + 1, position + 1, result);
-                        } else if (y < height - 1) {
-                            process(y + 1, 0, position + 1, result);
-                        }
-                    } else {
-                        process(0, 0, position + 1, result);
-                    }
+                    processBranch(y, x, position, result);
                 }
             }
         }
@@ -118,6 +100,25 @@ public class Engine {
             process(y, x + 1, position, nextField);
         } else if (y < height - 1) {
             process(y + 1, 0, position, nextField);
+        }
+    }
+
+    /**
+     * После того как поставили фигуру запускаем отдельную ветку вычислений
+     * @param y
+     * @param x
+     * @param position позиция указывющаяя на текущий элемент в скиске фигур которые нужно поставить
+     * @param result положение доски
+     */
+    private void processBranch(int y, int x, int position, Figure[][] result) {
+        if (figures.length > position + 1 && figures[position] == figures[position + 1]) {
+            if (x < width - 1) {
+                process(y, x + 1, position + 1, result);
+            } else if (y < height - 1) {
+                process(y + 1, 0, position + 1, result);
+            }
+        } else {
+            process(0, 0, position + 1, result);
         }
     }
 
