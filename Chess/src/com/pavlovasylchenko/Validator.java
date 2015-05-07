@@ -19,19 +19,19 @@ public class Validator {
             int posX = 0;
             int posY = 0;
             for (int i = 0; i < item.length(); i++) {
-                if (item.toCharArray()[i] == 'Q') {
+                if (item.charAt(i) == 'Q') {
                     figures = fillConstraints(posY, posX, Figure.QUEEN, figures);
                 }
-                if (item.toCharArray()[i] == 'R') {
+                if (item.charAt(i) == 'R') {
                     figures = fillConstraints(posY, posX, Figure.ROOK, figures);
                 }
-                if (item.toCharArray()[i] == 'K') {
+                if (item.charAt(i) == 'K') {
                     figures = fillConstraints(posY, posX, Figure.KING, figures);
                 }
-                if (item.toCharArray()[i] == 'N') {
+                if (item.charAt(i) == 'N') {
                     figures = fillConstraints(posY, posX, Figure.KNIGHT, figures);
                 }
-                if (item.toCharArray()[i] == 'B') {
+                if (item.charAt(i) == 'B') {
                     figures = fillConstraints(posY, posX, Figure.BISHOP, figures);
                 }
                 if (figures == null) {
