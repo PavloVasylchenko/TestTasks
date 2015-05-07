@@ -1,6 +1,14 @@
 package com.pavlovasylchenko;
 
-import java.util.*;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.StandardOpenOption;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Scanner;
 
 public class Main {
 
@@ -10,43 +18,66 @@ public class Main {
      */
     // javac -d out src/com/**/*.java
     // java -cp out/ com.pavlovasylchenko.Main
+    public static void main(String[] args) throws IOException {
+
+        Engine engine = new Engine(7, 7, Arrays.asList(
+                Figure.QUEEN,
+                Figure.QUEEN,
+                Figure.BISHOP,
+                Figure.BISHOP,
+                Figure.KNIGHT,
+                Figure.KING,
+                Figure.KING
+        ));
+
+        long first = System.currentTimeMillis();
+        List<Field> results = engine.getResult(false);
+        long last = System.currentTimeMillis();
+        System.out.println(((last - first)) / 1000d + " секунды");
+        System.out.println("Найдено количество: " + results.size());
+        saveToFile(results);
+    }
+
+    //sort output.txt | uniq -u > output2.txt
+    private static void saveToFile(List<Field> results) throws IOException {
+        BufferedWriter bw = Files.newBufferedWriter(new File("output.txt").toPath(), StandardOpenOption.CREATE);
+        for (Field result : results) {
+            StringBuilder sb = new StringBuilder();
+            for (Figure[] aField : result.getFieldArray()) {
+                for (Figure anAField : aField) {
+                    if (anAField == Figure.KING) sb.append("K");
+                    if (anAField == Figure.QUEEN) sb.append("Q");
+                    if (anAField == Figure.ROOK) sb.append("R");
+                    if (anAField == Figure.KNIGHT) sb.append("N");
+                    if (anAField == Figure.BISHOP) sb.append("B");
+                    if (anAField == Figure.NONE) sb.append("-");
+                    if (anAField == null) sb.append("-");
+                }
+            }
+            bw.write(sb.toString());
+            bw.write("\r\n");
+        }
+        bw.close();
+    }
+
 //    public static void main(String[] args) {
 //
-//        Engine engine = new Engine(7, 7, Arrays.asList(
-//                Figure.QUEEN,
-//                Figure.QUEEN,
-//                Figure.BISHOP,
-//                Figure.BISHOP,
-//                Figure.KNIGHT,
-//                Figure.KING,
-//                Figure.KING
-//        ));
+//        ReadInput readInput = new ReadInput().invoke();
 //
+//        int width = readInput.getWidth();
+//        int height = readInput.getHeight();
+//        List<Figure> figures = readInput.getFigures();
+//
+//        Engine engine = new Engine(width, height, figures);
 //        long first = System.currentTimeMillis();
 //        List<Field> results = engine.getResult(true);
 //        long last = System.currentTimeMillis();
 //        System.out.println(((last - first)) / 1000d + " секунды");
-//        System.out.println("Найдено количество: " + results.size());
+//        //System.out.println("Найдено количество: " + results.size());
+//        //for (Field resultField : results) {
+//            //printField(resultField.getFieldArray());
+//        //}
 //    }
-
-    public static void main(String[] args) {
-
-        ReadInput readInput = new ReadInput().invoke();
-
-        int width = readInput.getWidth();
-        int height = readInput.getHeight();
-        List<Figure> figures = readInput.getFigures();
-
-        Engine engine = new Engine(width, height, figures);
-        long first = System.currentTimeMillis();
-        List<Field> results = engine.getResult(true);
-        long last = System.currentTimeMillis();
-        System.out.println(((last - first)) / 1000d + " секунды");
-        //System.out.println("Найдено количество: " + results.size());
-        //for (Field resultField : results) {
-            //printField(resultField.getFieldArray());
-        //}
-    }
 
     public static void printField(Figure[][] field) {
         System.out.println("-------------------------");

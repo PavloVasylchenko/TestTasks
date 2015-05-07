@@ -59,7 +59,7 @@ public class Engine {
                 }
             }
         }
-        System.out.println("Всего вариантов: " + wins.get());
+        //System.out.println("Всего вариантов: " + wins.get());
         executor.shutdown();
         return results;
     }
@@ -86,9 +86,9 @@ public class Engine {
             final Figure[][] result = fillConstraints(y, x, figures[position], arrCopy(nextField));
             if (result != null) {
                 if (position > figures.length - 2) {
-                    //synchronized (Engine.class) {
-                    //   results.add(new Field(result));
-                    //}
+                    synchronized (Engine.class) {
+                       results.add(new Field(result));
+                    }
                     wins.incrementAndGet();
                 } else {
                     processBranch(y, x, position, result);
