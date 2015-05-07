@@ -14,7 +14,8 @@ public class Main {
 
     /*
         Result:
-
+        Всего вариантов: 3063828
+        3.17 секунды
      */
     // javac -d out src/com/**/*.java
     // java -cp out/ com.pavlovasylchenko.Main
